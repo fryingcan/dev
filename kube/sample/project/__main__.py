@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import falcon
+import hvac
 import requests
 import waitress
 from google.auth import jwt
@@ -23,12 +24,13 @@ class IndexRoute:
 class GetVaultTokenRoute:
     def on_get(self, req, resp):
         token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
-        response = requests.put(vault_url + "/v1/auth/kubernetes/login", json={
-            "role": "demo",
-            "jwt": token_raw
-        }).json()
+        # response = requests.put(vault_url + "/v1/auth/kubernetes/login", json={
+        #     "role": "demo",
+        #     "jwt": token_raw
+        # }).json()
+        vc = hvac.Client(url=vault_url)
+        response = vc.auth_kubernetes("demo", token_raw)
         resp.media = response
-
 
 class GetKubeServiceAccount:
     def on_get(self, req, resp):
