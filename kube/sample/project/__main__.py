@@ -23,13 +23,11 @@ class IndexRoute:
 class GetVaultTokenRoute:
     def on_get(self, req, resp):
         token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
-        logger.info(requests.post("http://192.168.99.100:32148/v1/auth/kubernetes/kubernetes/login", json={
+        response = requests.put("http://192.168.99.100:32148/v1/auth/kubernetes/login", json={
             "role": "demo",
             "jwt": token_raw
-        }, headers={"X-Vault-Token": "none"}).json())
-        resp.media = {
-            "token": "1234"
-        }
+        }).json()
+        resp.media = response
 
 
 class GetKubeServiceAccount:
