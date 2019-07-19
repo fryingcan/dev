@@ -42,6 +42,17 @@
         });
     });
 
+    $("#cert-button").click(e => {
+        if (!vaultToken) {
+            return;
+        }
+        $.getJSON("/api/externalCertificate?token=" + vaultToken, data => {
+            console.log(data);
+            $("#cert").text(data["data"]["data"]["cert"]);
+            $("#key").text(data["data"]["data"]["private_key"]);
+        });
+    });
+
     function updateVaultToken(t) {
         vaultToken = t;
         $("#vault-token").text(vaultToken);
@@ -50,6 +61,8 @@
         } else {
             $("#cert-section").addClass("hidden");
         }
+        $("#cert").text();
+        $("#key").text();
     }
 </script>
 </body>
