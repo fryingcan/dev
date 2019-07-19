@@ -4,6 +4,7 @@ from pathlib import Path
 
 import falcon
 import hvac
+from hvac import exceptions
 import requests
 import waitress
 from google.auth import jwt
@@ -42,10 +43,14 @@ class GetCertificateRoute:
         
         vc = hvac.Client(url=vault_url, token=vault_token)
         logger.info("Using Vault token %s", vault_token)
-        resp.media = vc.secrets.kv.v2.read_secret_version(
-            path='restricted/external-certificate',
-            mount_point='kv'
-        )
+        try:
+            secret = vc.secrets.kv.v2.read_secret_version(
+                path='restricted/external-certificate',
+                mount_point='kv'
+            )
+            resp.media = secret
+        except exceptions.Forbidden:
+            resp.media = {"error": "not allowed to read secret with this token"}
 
 class GetKubeServiceAccount:
     def on_get(self, req, resp):
