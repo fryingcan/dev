@@ -10,14 +10,30 @@
     Kubernetes service account: <span id="kube-sa"></span>
 </p>
 <p>
-    <button>Get Vault token</button>
+    Vault token: <span id="vault-token"></span>
+</p>
+<p>
+    <button id="vault-token-button">Get Vault token</button>
 </p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="application/javascript"></script>
 <script type="application/javascript">
+    var vaultToken = undefined;
+
     $.getJSON("/api/serviceAccount", function (data) {
         $("#kube-sa").text(data["name"] + " (namespace: " + data["namespace"] + ")");
     });
+
+    $("#vault-token-button").click(e => {
+        $.getJSON("/api/vaultToken", function(data) {
+            updateVaultToken(data["token"]);
+        });
+    });
+
+    function updateVaultToken(t) {
+        vaultToken = t;
+        $("#vault-token").text(vaultToken);
+    }
 </script>
 </body>
 </html>
