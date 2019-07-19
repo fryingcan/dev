@@ -17,6 +17,8 @@ spec:
           env:
           - name: WEB_HOST
             value: "0.0.0.0"
+          - name: VAULT_URL
+            value: "http://192.168.99.102:32148"
       serviceAccountName: sa-kube-sample
       automountServiceAccountToken: true
 

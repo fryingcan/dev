@@ -23,7 +23,7 @@ class IndexRoute:
 class GetVaultTokenRoute:
     def on_get(self, req, resp):
         token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
-        response = requests.put("http://192.168.99.100:32148/v1/auth/kubernetes/login", json={
+        response = requests.put(vault_url + "/v1/auth/kubernetes/login", json={
             "role": "demo",
             "jwt": token_raw
         }).json()
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     api.add_route("/api/vaultToken", GetVaultTokenRoute())
     api.add_route("/api/serviceAccount", GetKubeServiceAccount())
 
+    vault_url = os.getenv("VAULT_URL", "http://192.168.99.100:32148")
     ip_address = os.getenv("WEB_HOST", "127.0.0.1")
     port = 3000
 
