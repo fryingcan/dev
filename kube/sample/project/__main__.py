@@ -41,10 +41,11 @@ class GetCertificateRoute:
             return
         
         vc = hvac.Client(url=vault_url, token=vault_token)
-        logger.info(vc.secrets.kv.v2.read_secret_version(
-            path='kv/data/restricted/external-certificate',
-        ))
-        resp.media = {}
+        logger.info("Using Vault token %s", vault_token)
+        resp.media = vc.secrets.kv.v2.read_secret_version(
+            path='restricted/external-certificate',
+            mount_point='kv'
+        )
 
 class GetKubeServiceAccount:
     def on_get(self, req, resp):
