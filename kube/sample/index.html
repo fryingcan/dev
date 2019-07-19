@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kube-Vault Sample</title>
+</head>
+<body>
+<h1>Kube/Vault Auth Example</h1>
+<p>
+    Kubernetes service account: <span id="kube-sa"></span>
+</p>
+<p>
+    <button>Get Vault token</button>
+</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="application/javascript"></script>
+<script type="application/javascript">
+    $.getJSON("/api/serviceAccount", function (data) {
+        $("#kube-sa").text(data["name"] + " (namespace: " + data["namespace"] + ")");
+    });
+</script>
+</body>
+</html>

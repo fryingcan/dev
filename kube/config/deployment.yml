@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kube-sample-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: sample-pod
+      labels:
+        app: kube-sample
+    spec:
+      containers:
+        - name: app
+          image: fryingcan/kube-sample
+          imagePullPolicy: Never
+          env:
+          - name: WEB_HOST
+            value: "0.0.0.0"
+      serviceAccountName: sa-kube-sample
+      automountServiceAccountToken: true
+
