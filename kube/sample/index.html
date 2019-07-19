@@ -26,7 +26,7 @@
 
     $("#vault-token-button").click(e => {
         $.getJSON("/api/vaultToken", function(data) {
-            updateVaultToken(data["token"]);
+            updateVaultToken(data["auth"]["client_token"]);
         });
     });
 
