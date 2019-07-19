@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Kube-Vault Sample</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <h1>Kube/Vault Auth Example</h1>
@@ -14,6 +19,13 @@
 </p>
 <p>
     <button id="vault-token-button">Get Vault token</button>
+</p>
+<div class="hidden" id="cert-section">
+    <button id="cert-button">Fetch certificate</button>
+    <p><strong>Certificate:</strong></p>
+    <p id="cert"></p>
+    <p><strong>Private Key:</strong></p>
+    <p id="key"></p>
 </p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" type="application/javascript"></script>
@@ -33,6 +45,11 @@
     function updateVaultToken(t) {
         vaultToken = t;
         $("#vault-token").text(vaultToken);
+        if (vaultToken) {
+            $("#cert-section").removeClass("hidden");
+        } else {
+            $("#cert-section").addClass("hidden");
+        }
     }
 </script>
 </body>
