@@ -26,7 +26,7 @@ class IndexRoute:
         resp.body = Path("index.html").read_bytes()
 
 
-class GetKubeServiceAccountRouute:
+class GetKubeServiceAccountRoute:
     """
     (GET /api/serviceAccount)
     Get the current Kubernetes service account and JWT.
