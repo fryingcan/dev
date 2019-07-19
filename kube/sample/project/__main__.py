@@ -24,6 +24,7 @@ class IndexRoute:
 class GetVaultTokenRoute:
     def on_get(self, req, resp):
         token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
+        # Using the API directly:
         # response = requests.put(vault_url + "/v1/auth/kubernetes/login", json={
         #     "role": "demo",
         #     "jwt": token_raw
@@ -31,6 +32,19 @@ class GetVaultTokenRoute:
         vc = hvac.Client(url=vault_url)
         response = vc.auth_kubernetes("demo", token_raw)
         resp.media = response
+
+class GetCertificateRoute:
+    def on_get(self, req, resp):
+        vault_token = req.params.get("token")
+        if not vault_token:
+            resp.media = {"error": "no token provided"}
+            return
+        
+        vc = hvac.Client(url=vault_url, token=vault_token)
+        logger.info(vc.secrets.kv.v2.read_secret_version(
+            path='kv/',
+        ))
+        resp.media = {}
 
 class GetKubeServiceAccount:
     def on_get(self, req, resp):
@@ -55,6 +69,7 @@ if __name__ == "__main__":
     api.add_route("/", IndexRoute())
     api.add_route("/api/vaultToken", GetVaultTokenRoute())
     api.add_route("/api/serviceAccount", GetKubeServiceAccount())
+    api.add_route("/api/externalCertificate", GetCertificateRoute())
 
     vault_url = os.getenv("VAULT_URL", "http://192.168.99.100:32148")
     ip_address = os.getenv("WEB_HOST", "127.0.0.1")
