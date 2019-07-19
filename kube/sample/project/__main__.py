@@ -17,12 +17,38 @@ logger.setLevel(logging.DEBUG)
 
 
 class IndexRoute:
+    """
+    (GET /)
+    Index route (HTML)
+    """
     def on_get(self, req, resp):
         resp.content_type = 'text/html'
         resp.body = Path("index.html").read_bytes()
 
 
+class GetKubeServiceAccountRouute:
+    """
+    (GET /api/serviceAccount)
+    Get the current Kubernetes service account and JWT.
+    """
+    def on_get(self, req, resp):
+        token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
+        token = jwt.decode(token_raw, verify=False)
+        sa_namespace = token["kubernetes.io/serviceaccount/namespace"]
+        sa_name = token["kubernetes.io/serviceaccount/service-account.name"]
+
+        resp.media = {
+            "name": sa_name,
+            "namespace": sa_namespace,
+            "token": token_raw
+        }
+
+
 class GetVaultTokenRoute:
+    """
+    (GET /api/vaultToken)
+    Authenticates to Vault using the local service account.
+    """
     def on_get(self, req, resp):
         token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
         # Using the API directly:
@@ -34,7 +60,12 @@ class GetVaultTokenRoute:
         response = vc.auth_kubernetes("demo", token_raw)
         resp.media = response
 
+
 class GetCertificateRoute:
+    """
+    (GET /api/externalCertificate?token={VAULT_TOKEN})
+    Get the protected resource (certificate) inside Vault using an authorized token.
+    """
     def on_get(self, req, resp):
         vault_token = req.params.get("token")
         if not vault_token:
@@ -52,29 +83,20 @@ class GetCertificateRoute:
         except exceptions.Forbidden:
             resp.media = {"error": "not allowed to read secret with this token"}
 
-class GetKubeServiceAccount:
-    def on_get(self, req, resp):
-        token_raw = Path(SERVICE_TOKEN_FILENAME).read_text()
-        token = jwt.decode(token_raw, verify=False)
-        sa_namespace = token["kubernetes.io/serviceaccount/namespace"]
-        sa_name = token["kubernetes.io/serviceaccount/service-account.name"]
-
-        resp.media = {
-            "name": sa_name,
-            "namespace": sa_namespace,
-            "token": token_raw
-        }
-
 
 if __name__ == "__main__":
+    # Connect to the API inside the cluster
     config.load_incluster_config()
     kube = client.CoreV1Api()
+
+    logger.info("Kubernetes CA cert:")
     logger.info(Path(SERVICE_CERT_FILENAME).read_text())
 
+    # REST API
     api = falcon.API()
     api.add_route("/", IndexRoute())
+    api.add_route("/api/serviceAccount", GetKubeServiceAccountRoute())
     api.add_route("/api/vaultToken", GetVaultTokenRoute())
-    api.add_route("/api/serviceAccount", GetKubeServiceAccount())
     api.add_route("/api/externalCertificate", GetCertificateRoute())
 
     vault_url = os.getenv("VAULT_URL", "http://192.168.99.100:32148")
