@@ -42,7 +42,7 @@ class GetCertificateRoute:
         
         vc = hvac.Client(url=vault_url, token=vault_token)
         logger.info(vc.secrets.kv.v2.read_secret_version(
-            path='kv/restricted/external-certificate',
+            path='kv/data/restricted/external-certificate',
         ))
         resp.media = {}
 
