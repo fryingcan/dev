@@ -54,10 +54,7 @@ module.exports = (app, provider) => {
                 });
             }
             // Redirect to consent page
-            res.statusCode = 302; // eslint-disable-line no-param-reassign
-            res.setHeader('Location', "/interaction/" + req.params.grant + "/confirm");
-            res.setHeader('Content-Length', '0');
-            res.end();
+            res.redirect("/interaction/" + req.params.grant + "/confirm");
             // User is authenticated, show consent form
             // return res.render("authorize", {
             //    client, details,
@@ -87,10 +84,9 @@ module.exports = (app, provider) => {
             await provider.interactionResult(req, res, result);
 
             // Redirect to consent page
-            res.statusCode = 302;
-            res.setHeader('Location', "/interaction/" + req.params.grant + "/confirm");
-            res.setHeader('Content-Length', '0');
-            res.end();
+            req.session.save(() => {
+                res.redirect("/interaction/" + req.params.grant + "/confirm");
+            });
         } catch (err) {
             next(err);
         }
@@ -107,10 +103,7 @@ module.exports = (app, provider) => {
 
             if (details.interaction.error === "login_required") {
                 // Redirect to login page -- not authenticated
-                res.statusCode = 302;
-                res.setHeader('Location', "/interaction/" + req.params.grant);
-                res.setHeader('Content-Length', '0');
-                res.end();
+                res.redirect("/interaction/" + req.params.grant);
                 return;
             }
 
