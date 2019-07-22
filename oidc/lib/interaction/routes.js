@@ -84,9 +84,7 @@ module.exports = (app, provider) => {
             await provider.interactionResult(req, res, result);
 
             // Redirect to consent page
-            req.session.save(() => {
-                res.redirect("/interaction/" + req.params.grant + "/confirm");
-            });
+            res.redirect("/interaction/" + req.params.grant + "/confirm");
         } catch (err) {
             next(err);
         }
@@ -99,7 +97,7 @@ module.exports = (app, provider) => {
             const details = await provider.interactionDetails(req);
             // client: the info about the client, retrieved from persistence
             const client = await provider.Client.find(details.params.client_id);
-            console.log(details.interaction);
+            console.log(details);
 
             if (details.interaction.error === "login_required") {
                 // Redirect to login page -- not authenticated
@@ -110,7 +108,7 @@ module.exports = (app, provider) => {
             return res.render("authorize", {
                 client, details,
                 title: "Authorize"
-             });
+            });
         } catch(err) {
             next(err);
         }
