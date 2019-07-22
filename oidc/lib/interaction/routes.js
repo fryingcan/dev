@@ -103,9 +103,10 @@ module.exports = (app, provider) => {
             const details = await provider.interactionDetails(req);
             // client: the info about the client, retrieved from persistence
             const client = await provider.Client.find(details.params.client_id);
+            console.log(details.interaction);
 
             if (details.interaction.error === "login_required") {
-                // Redirect to consent page
+                // Redirect to login page -- not authenticated
                 res.statusCode = 302;
                 res.setHeader('Location', "/interaction/" + req.params.grant);
                 res.setHeader('Content-Length', '0');
