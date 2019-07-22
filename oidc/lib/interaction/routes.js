@@ -14,7 +14,7 @@ module.exports = (app, provider) => {
 
     // Use the _layout.ejs tempalte as base for the other templates
     app.use((req, res, next) => {
-        const orig;
+        const orig = res.render;
         res.render = (view, locals) => {
             app.render(view, locals, (err, html) => {
                 if (err) throw err;
