@@ -53,11 +53,16 @@ module.exports = (app, provider) => {
                     title: "Sign-in"
                 });
             }
+            // Redirect to consent page
+            res.statusCode = 302; // eslint-disable-line no-param-reassign
+            res.setHeader('Location', "/interaction/" + req.params.grant + "/confirm");
+            res.setHeader('Content-Length', '0');
+            res.end();
             // User is authenticated, show consent form
-            return res.render("authorize", {
-                client, details,
-                title: "Authorize"
-            });
+            // return res.render("authorize", {
+            //    client, details,
+            //    title: "Authorize"
+            // });
         } catch (err) {
             next(err);
         }
@@ -76,20 +81,51 @@ module.exports = (app, provider) => {
                     amr: ['pwd'], // TODO: ???
                     remember: false,
                     ts: Math.floor(Date.now() / 1000)
-                },
-                consent: {}
+                }
             };
 
-            await provider.interactionFinished(req, res, result);
+            await provider.interactionResult(req, res, result);
+
+            // Redirect to consent page
+            res.statusCode = 302;
+            res.setHeader('Location', "/interaction/" + req.params.grant + "/confirm");
+            res.setHeader('Content-Length', '0');
+            res.end();
         } catch (err) {
             next(err);
         }
     });
 
-    // When the user already has a login cookie (auth without credentials)
+    // Show the consent page if already logged-in
+    app.get("/interaction/:grant/confirm", setNoCache, async (req, res, next) => {
+        try {
+            // details: the OAuth parameters given by the client
+            const details = await provider.interactionDetails(req);
+            // client: the info about the client, retrieved from persistence
+            const client = await provider.Client.find(details.params.client_id);
+
+            if (details.interaction.error === "login_required") {
+                // Redirect to consent page
+                res.statusCode = 302;
+                res.setHeader('Location', "/interaction/" + req.params.grant);
+                res.setHeader('Content-Length', '0');
+                res.end();
+                return;
+            }
+
+            return res.render("authorize", {
+                client, details,
+                title: "Authorize"
+             });
+        } catch(err) {
+            next(err);
+        }
+    });
+
+    // Complete consent for this interaction
     app.post("/interaction/:grant/confirm", setNoCache, body, async (req, res, next) => {
         try {
-            const result = { consent: {} }; // TODO: ???
+            const result = { consent: {} };
             await provider.interactionFinished(req, res, result);
         } catch (err) {
             next(err);
