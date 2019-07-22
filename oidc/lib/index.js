@@ -12,6 +12,6 @@ oidc.initialize().then(function () {
     app.enable('trust proxy');
     oidc.proxy = true;
 
-    app.use('/', oidc.callback);
+    app.use(oidc.callback);
     app.listen(3000, "0.0.0.0");
 });
