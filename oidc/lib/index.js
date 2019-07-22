@@ -15,7 +15,8 @@ const oidc = new Provider('https://openid.momoperes.ca', {  // TODO: Env variabl
     claims: {
         // Defines the mapping for scope -> allowed claims
         groups: ["groups"]
-    }
+    },
+    promps: ["login", "consent"]
 });
 
 // TODO: dynamic clients (source from Vault?)

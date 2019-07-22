@@ -69,6 +69,7 @@ module.exports = (app, provider) => {
             // TODO: authentication from body parameters
 
             const result = {
+                // "Prompts" work by the keys being provided in this "result" object. "consent" and "login" prompts must both be provided for the interaction to complete.
                 login: {
                     account: require('uuid').v4(), // TODO
                     acr: 'urn:mace:incommon:iap:bronze', // TODO: ???
@@ -76,7 +77,8 @@ module.exports = (app, provider) => {
                     remember: false,
                     ts: Math.floor(Date.now() / 1000)
                 },
-                consent: {} // TODO: ???
+                // Don't consent just yet
+                // consent: {}
             };
 
             await provider.interactionFinished(req, res, result);
