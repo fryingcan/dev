@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: oidc-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: oidc-pod
+      labels:
+        app: oidc
+    spec:
+      containers:
+      - name: oidc
+        image: fryingcan/oidc
+        imagePullPolicy: Never
+        env:
+        - name: WEB_HOST
+          value: "0.0.0.0"
