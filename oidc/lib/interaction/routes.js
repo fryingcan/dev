@@ -6,6 +6,10 @@
 // the interaction and creates a session that can issue an ID token.
 // What happens next depends on the flow used (e.g. authg code, implicit, etc.).
 
+const querystring = require('querystring');
+const { urlencoded } = require('express');
+const body = urlencoded({ extended: false });
+
 module.exports = (app, provider) => {
     // app: the Express server app
     // provider: node-oidc-provider "Provider" instance

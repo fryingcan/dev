@@ -5,6 +5,7 @@ const express = require('express');
 const Provider = require('oidc-provider');
 const app = express();
 const interactionRoutes = require("./interaction/routes");
+const path = require('path');
 
 // Set up rendering HTML templates using EJS
 app.set('views', path.join(__dirname, 'interaction', 'views'));
