@@ -1,12 +1,18 @@
+// This is the entrypoint of the application.
+// The oidc-provider is servied using Express.
+
 const express = require('express');
 const Provider = require('oidc-provider');
-
 const app = express();
+const interactionRoutes = require("./interaction/routes");
 
-console.log("Starting provider.");
+// Set up rendering HTML templates using EJS
+app.set('views', path.join(__dirname, 'interaction', 'views'));
+app.set('view engine', 'ejs');
 
 const oidc = new Provider('https://openid.momoperes.ca', {  // TODO: Env variable
     claims: {
+        // Defines the mapping for scope -> allowed claims
         groups: ["groups"]
     }
 });
@@ -26,6 +32,7 @@ oidc.initialize({clients}).then(function () {
     app.enable('trust proxy');
     oidc.proxy = true;
 
+    interactionRoutes(app, oidc);
     app.use(oidc.callback);
-    app.listen(3000, "0.0.0.0");
+    app.listen(3000, "0.0.0.0"); // TODO: Env variable
 });
