@@ -5,9 +5,23 @@ const app = express();
 
 console.log("Starting provider.");
 
-const oidc = new Provider('https://openid.momoperes.ca');
+const oidc = new Provider('https://openid.momoperes.ca', {  // TODO: Env variable
+    claims: {
+        groups: ["groups"]
+    }
+});
 
-oidc.initialize().then(function () {
+// TODO: dynamic clients (source from Vault?)
+const clients = [
+    {
+        client_id: 'test',
+        client_secret: "test",
+        grant_types: ["authorization_code"],
+        redirect_uris: ["https://vault.momoperes.ca/ui/vault/auth/oidc/oidc/callback"]
+    }
+]
+
+oidc.initialize({clients}).then(function () {
     // behind HTTPS proxy
     app.enable('trust proxy');
     oidc.proxy = true;
