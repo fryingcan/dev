@@ -27,6 +27,7 @@ const clients = [
     }
 ]
 
+// TODO: Provide adapters in the .initialize() settings
 oidc.initialize({clients}).then(function () {
     // behind HTTPS proxy
     app.enable('trust proxy');
