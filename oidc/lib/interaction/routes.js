@@ -77,8 +77,7 @@ module.exports = (app, provider) => {
                     remember: false,
                     ts: Math.floor(Date.now() / 1000)
                 },
-                // Don't consent just yet
-                // consent: {}
+                consent: {}
             };
 
             await provider.interactionFinished(req, res, result);
