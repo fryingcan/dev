@@ -42,7 +42,7 @@ module.exports = (app, provider) => {
     app.get("/interaction/:grant", setNoCache, async (req, res, next) => {
         try {
             // details: the OAuth parameters given by the client
-            const details = await provider.interactionDetails();
+            const details = await provider.interactionDetails(req);
             // client: the info about the client, retrieved from persistence
             const client = await provider.Client.find(details.params.client_id);
 
