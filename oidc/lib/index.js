@@ -22,8 +22,8 @@ const oidc = new Provider('https://openid.momoperes.ca', {  // TODO: Env variabl
 // TODO: dynamic clients (source from Vault?)
 const clients = [
     {
-        client_id: 'test',
-        client_secret: "test",
+        client_id: 'vault',
+        client_secret: "demo",
         grant_types: ["authorization_code"],
         redirect_uris: ["https://vault.momoperes.ca/ui/vault/auth/oidc/oidc/callback"]
     }
