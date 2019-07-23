@@ -80,8 +80,10 @@ module.exports = (app, provider) => {
                     ts: Math.floor(Date.now() / 1000)
                 }
             };
-
             await provider.interactionResult(req, res, result);
+
+            // Mark the session as logged-in
+            await provider.setProviderSession(req, res, {account: result.login.account})
 
             // Redirect to consent page
             res.redirect("/interaction/" + req.params.grant + "/confirm");
@@ -93,13 +95,12 @@ module.exports = (app, provider) => {
     // Show the consent page if already logged-in
     app.get("/interaction/:grant/confirm", setNoCache, async (req, res, next) => {
         try {
-            // details: the OAuth parameters given by the client
+            // details: the OAuth parameters given by the client and other context
             const details = await provider.interactionDetails(req);
             // client: the info about the client, retrieved from persistence
             const client = await provider.Client.find(details.params.client_id);
-            console.log(details);
 
-            if (details.interaction.error === "login_required") {
+            if (!details.result || !details.result.login) {
                 // Redirect to login page -- not authenticated
                 res.redirect("/interaction/" + req.params.grant);
                 return;
@@ -117,6 +118,7 @@ module.exports = (app, provider) => {
     // Complete consent for this interaction
     app.post("/interaction/:grant/confirm", setNoCache, body, async (req, res, next) => {
         try {
+            // TODO: Handle body for scope etc.
             const result = { consent: {} };
             await provider.interactionFinished(req, res, result);
         } catch (err) {
